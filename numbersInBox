@@ -1,0 +1,39 @@
+import java.lang.Math;
+public class SudokuSolver {
+   public static void main(String[] args) {
+   int[][][] puzzle = {{{1,2,3,4},{1,2,3,4},{1,2,3,4},{1,2,3,4}},{{3,0,0,0},{1,0,0,0},{4,0,0,0},{2,0,0,0}},{{2,0,0,0},{4,0,0,0},{3,0,0,0},{1,0,0,0}},{{1,2,3,4},{1,2,3,4},{1,2,3,4},{1,2,3,4}}};
+   int[][] boxNums = numbersInBox(puzzle);
+   }
+   
+   
+   public static int[][] numbersInBox(int m[][][]) {
+      int S = m.length;
+      int size = (int) Math.pow(S, 0.5); //Find length of box.
+      //System.out.println(i);
+      
+      int[][] nums = new int[S][S];
+      int i = 0; // Box number. Read Sudoku like a book.
+      while (i < S) {
+         int j = 0; //Index box row.
+         while (j < size) {
+            int k = 0; //Index box colomn.
+            while (k < size) {
+               if (m[(i/2)*2+j][(i%2)*2+k][1] == 0) // If number is the only one.
+                  nums[i][(m[(i/2)*2+j][(i%2)*2+k][0])-1] = m[(i/2)*2+j][(i%2)*2+k][0];
+               k += 1;
+            }
+            j += 1;
+         }
+         i += 1;
+      }
+      int l = 0;
+      while (l < nums.length) {
+         System.out.print(nums[l][0]+", ");
+         System.out.print(nums[l][1]+", ");
+         System.out.print(nums[l][2]+", ");
+         System.out.println(nums[l][3]);
+         l += 1;
+      }
+      return nums;
+   }
+}
