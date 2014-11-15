@@ -1,0 +1,300 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.Color;
+import java.awt.event.*;
+import javax.swing.border.LineBorder;
+import java.util.Arrays;
+
+public class Testing implements ActionListener{
+      static int thisIsABadName; //same as n, the input size, nxn grid
+      static JButton numberBox[][];
+      static JFrame mostRecent;     //When creating a new Cell Mananger, close the previous one
+      static JButton mostRecentButton; //When clicking on a cell to edit, color cell and uncolor previously colored cell
+      
+  public static void main(String[] args) {
+      String inputSize;
+      
+      //Display GUI to ask for puzzle size
+      inputSize = JOptionPane.showInputDialog("Please enter the size of your sudoku board: ");
+      int n = Integer.parseInt(inputSize); 
+      thisIsABadName = n;
+      
+      //Make Sudoku GUI
+      Testing sudoku = new Testing(n);                 
+  } 
+  
+   
+  public Testing(int n) {
+      String inputPuzzle; 
+      int puzzle[][] = new int[n][n];
+      numberBox = new JButton[n][n];
+      
+      //Create initial Sudoku GUI
+      JFrame frame = new JFrame("Awesome Sudoku");
+      Container con = frame.getContentPane();
+      con.setLayout(new GridLayout(n,n));
+      
+      for (int i = 0; i < n; i++)
+         for (int j = 0; j < n; j++) {
+             //Create buttons (boxes)
+             con.add(numberBox[i][j] = new JButton());
+             numberBox[i][j].addActionListener(this);
+             numberBox[i][j].setName(""+i+""+j);
+             
+             //Create Sudoku gridlines
+             numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,Color.BLACK));
+             
+             if (i%Math.pow(n,0.5) == 0 && j%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(4, 4, 1, 1,Color.BLACK));
+               
+             else if (j%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 4, 1, 1,Color.BLACK));
+             
+             else if (i%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(4, 1, 1, 1,Color.BLACK));
+               
+             if (i == n-1 && j == n-1)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 4, 4,Color.BLACK));
+               
+             else if (i == n-1 && j%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 4, 4, 1,Color.BLACK));  
+               
+             else if (i == n-1 && i%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(4, 1, 4, 1,Color.BLACK)); 
+               
+             else if (j == n-1 && j%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 4, 1, 4,Color.BLACK)); 
+                  
+             else if (j == n-1 && i%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(4, 1, 1, 4,Color.BLACK));  
+               
+             else if (i == n-1)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 4, 1,Color.BLACK));
+               
+             else if (j == n-1)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 4,Color.BLACK));  
+         }
+               
+      frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      frame.setBounds(0,0,600,600);
+      frame.setVisible(true);
+      
+      
+      //Display GUI to get data on the i-th Sudoku row 
+      for (int i = 0; i < n; i++) {
+         
+         //Quit if size of puzzle is greater than 9
+         if (n > 9) {
+            JOptionPane.showMessageDialog(null, "max sudoku size is 9", "ERROR", JOptionPane.ERROR_MESSAGE);
+            frame.dispose();
+            break;
+         }   
+         
+         inputPuzzle = JOptionPane.showInputDialog("Please input the values of row #" + i + " of the sudoku board (q to quit): ");
+         
+         //If cancel is pressed, delete previous row
+         if (inputPuzzle == null) {
+            if (i > 0) {
+               i--;
+               for (int j = 0; j < n; j++)
+                  numberBox[i][j].setText("");   
+               i--;   
+            }
+            else
+               i--;
+         }
+         
+         //If q is pressed, end process
+         else if (inputPuzzle.equals("q")) {
+            frame.dispose();
+            break;
+         }
+         
+         //Else, add row to Sudoku GUI 
+         else
+            for (int j = 0; j < n; j++)
+               if (inputPuzzle.length() > j)
+                  if (inputPuzzle.charAt(j) != '0' && inputPuzzle.charAt(j) != ' ')
+                     numberBox[i][j].setText(inputPuzzle.substring(j,j+1));   
+      }  
+      
+      
+      //Save Sudoku grid
+      int grid[][] = new int[n][n];
+      for (int i = 0; i < n; i++)
+         for (int j = 0; j < n; j++)
+            if (numberBox[i][j].getText().equals(""))
+                grid[i][j] = 0;
+            else
+                grid[i][j] = Integer.parseInt(numberBox[i][j].getText());
+                
+                
+     //Translate to weird 3D Sudoku format
+     int zero[] = new int[n];
+     
+     // initialize our zero array with 1..n
+     // to represent all posible values for 
+     // an empty cell. 
+     for (int i = 0; i < n; i++)
+         zero[i] = i+1;
+         
+     int sudoku3D[][][] = new int[n][n][n];
+     
+     // iterate across y-axis
+     for (int i = 0; i < n; i++){
+         // iterates accross the x-axis
+         for (int j = 0; j < n; j++) {
+            // if the cell does not have a given value
+            if (grid[i][j] == 0) 
+               sudoku3D[i][j] = Arrays.copyOf(zero,zero.length);
+            // other wise the cell was provided a value from the user
+            else {
+               int temp[] = new int[n];
+               temp[0] = grid[i][j];
+               sudoku3D[i][j] = temp;        
+            }
+         }
+     }
+     
+     //char sudokuSolution[][] = SudokuSolver.solvePuzzle(sudoku3D);
+  }  
+  
+  
+  
+  //
+  //
+  //
+  //
+  //Clicking on Sudoku GUI
+  //
+  public void actionPerformed(ActionEvent e) {
+  
+      JButton button = (JButton)e.getSource();
+      String name = button.getName();
+      
+      
+      //If clicked on a interger cell in the Cell Manager 
+      if (name.charAt(0) == 'I') {
+         int i = Integer.parseInt(name.substring(3,4));
+         int j = Integer.parseInt(name.substring(4,5));
+         numberBox[i][j].setText(name.substring(1,2));
+         
+         //Close frame
+         Component component = (Component) e.getSource();
+         JFrame frame = (JFrame) SwingUtilities.getRoot(component);
+         frame.dispose();
+         
+         //Revert cell to normal color
+         if (mostRecentButton != null) {
+            if (numberBox[0][0] == mostRecentButton)
+                mostRecentButton.setBackground(numberBox[0][1].getBackground());
+            else
+                mostRecentButton.setBackground(numberBox[0][0].getBackground());
+         }
+      }
+      
+      //If clicked on an option cell in the Cell Manager 
+      else if (name.charAt(0) >= 'a' && name.charAt(0) <= 'z') {
+         int i = Integer.parseInt(name.substring(6,7));
+         int j = Integer.parseInt(name.substring(7,8));
+         
+         if (name.substring(0,6).equals("clearC")) {
+            numberBox[i][j].setText(""); 
+         }
+         
+         else if (name.substring(0,6).equals("solveC")) {
+         ;
+         }
+         
+         else if (name.substring(0,6).equals("clearB"))
+            for (int a = 0; a < thisIsABadName; a++)
+               for (int b = 0; b < thisIsABadName; b++)
+                  numberBox[a][b].setText(""); 
+                  
+         else if (name.substring(0,6).equals("solveB"))
+         ;
+         
+         //Close frame
+         Component component = (Component) e.getSource();
+         JFrame frame = (JFrame) SwingUtilities.getRoot(component);
+         frame.dispose();
+         
+         //Revert cell to normal color
+         if (mostRecentButton != null) {
+            if (numberBox[0][0] == mostRecentButton)
+                mostRecentButton.setBackground(numberBox[0][1].getBackground());
+            else
+                mostRecentButton.setBackground(numberBox[0][0].getBackground());
+         }
+      }
+      
+      
+      //If clicked on a cell on the main Sudoku GUI, create Cell Manager GUI
+      else {
+      
+         //close any previously open Cell Manager windows
+         if (mostRecent != null)
+            mostRecent.dispose(); 
+      
+         //Revert cell to normal color
+         if (mostRecentButton != null) {
+            if (numberBox[0][0] == mostRecentButton)
+                mostRecentButton.setBackground(numberBox[0][1].getBackground());
+            else
+                mostRecentButton.setBackground(numberBox[0][0].getBackground());
+         }
+         //Change color of selected cell [the cell we want to manage]
+         button.setBackground(Color.YELLOW);
+         mostRecentButton = button;
+         
+         
+                                                  
+         int i = Integer.parseInt(name.substring(0,1));
+         int j = Integer.parseInt(name.substring(1,2));
+         JFrame editFrame = new JFrame("Editting menu");
+         mostRecent = editFrame;
+         Container con = editFrame.getContentPane();
+         
+         //The Panel that holds other Panels
+         JPanel theBackGroundPanel = new JPanel();
+         theBackGroundPanel.setLayout(null);
+   
+         //Panel to hold a grid from 1 to n
+         JPanel gridPanel = new JPanel();   
+         gridPanel.setLocation(0,0);
+         gridPanel.setSize(300, 300);
+         gridPanel.setLayout(new GridLayout((int)Math.pow(thisIsABadName, 0.5),(int)Math.pow(thisIsABadName, 0.5)));
+         for (int k = 1; k < thisIsABadName+1; k++) {
+            JButton temp = new JButton(""+k);
+            temp.setName("I"+k+"_"+name+"");
+            temp.addActionListener(this);
+            gridPanel.add(temp);
+         }
+         theBackGroundPanel.add(gridPanel);
+         
+         //Panel to add options (clear cell, solve cell, clear board, solve board)
+         JPanel optionsPanel = new JPanel();
+         JButton clearCell = new JButton("clear cell"); clearCell.setName("clearC"+i+""+j); clearCell.addActionListener(this);
+         JButton solveCell = new JButton("solve cell"); solveCell.setName("solveC"+i+""+j); solveCell.addActionListener(this);
+         JButton clearBoard = new JButton("clear board"); clearBoard.setName("clearB"+i+""+j); clearBoard.addActionListener(this);
+         JButton solveBoard = new JButton("solve board"); solveBoard.setName("solveB"+i+""+j); solveBoard.addActionListener(this);
+         
+         optionsPanel.setLocation(0,300);
+         optionsPanel.setSize(300, 200);
+         optionsPanel.setLayout(new GridLayout(4,4));
+         optionsPanel.add(clearCell);
+         optionsPanel.add(solveCell);
+         optionsPanel.add(clearBoard);
+         optionsPanel.add(solveBoard);
+         theBackGroundPanel.add(optionsPanel);
+         
+         
+         //Add everything to content page and set visible
+         con.add(theBackGroundPanel);
+         theBackGroundPanel.setOpaque(true);
+         editFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+         editFrame.setBounds(600,0,315,540);
+         editFrame.setVisible(true);                  
+      }
+  }
+}
