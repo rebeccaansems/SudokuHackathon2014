@@ -27,13 +27,13 @@ public class SudokuSolver {
          i += 1;
       }
       int l = 0;
-      while (l < nums.length) {
-         System.out.print(nums[l][0]+", ");
-         System.out.print(nums[l][1]+", ");
-         System.out.print(nums[l][2]+", ");
-         System.out.println(nums[l][3]);
-         l += 1;
-      }
+      //while (l < nums.length) {
+      //   System.out.print(nums[l][0]+", ");
+      //   System.out.print(nums[l][1]+", ");
+      //   System.out.print(nums[l][2]+", ");
+      //   System.out.println(nums[l][3]);
+      //   l += 1;
+      //}
       return nums;
    }
 }
