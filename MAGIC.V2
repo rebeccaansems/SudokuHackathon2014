@@ -1,0 +1,212 @@
+import java.lang.Math;
+import java.util.Arrays;
+public class SudokuSolver {
+   public static void main(String[] args) {
+      int[][][] puzzle = {{{1,2,3,4},{1,2,3,4},{1,2,3,4},{1,2,3,4}},{{3,0,0,0},{1,0,0,0},{4,0,0,0},{2,0,0,0}},{{2,0,0,0},{4,0,0,0},{3,0,0,0},{1,0,0,0}},{{1,2,3,4},{1,2,3,4},{1,2,3,4},{1,2,3,4}}};
+      //int[][] boxNums = numbersInRow(puzzle);
+      int cont = 1;
+      int size = puzzle.length;
+      //while (cont > 0){
+      //   cont = 0;
+      //   int i = 0;
+      //   while (i < size) {
+      //      int j = 0;
+      //      while (j < size) {
+      //         cont += puzzle[i][j][1];
+      //         j += 1;
+      //      }
+      //      i += 1;
+      //   }
+         puzzle = removeVals(puzzle);
+
+         printPuzzle(puzzle);
+      //}
+   }
+   
+   
+   public static int[][] numbersInBox(int m[][][]) {
+      int S = m.length;
+      int size = (int) Math.pow(S, 0.5); //Find length of box.
+      //System.out.println(i);
+      
+      int[][] nums = new int[S][S];
+      int i = 0; // Box number. Read Sudoku like a book.
+      while (i < S) {
+         int j = 0; //Index box row.
+         while (j < size) {
+            int k = 0; //Index box column.
+            while (k < size) {
+            //System.out.println("Checkoint2 "+i+" "+j+" "+k);
+               if (m[(i/2)*2+j][(i%2)*2+k][1] == 0){ // If number is the only one.
+                  nums[i][(m[(i/2)*2+j][(i%2)*2+k][0])-1] = m[(i/2)*2+j][(i%2)*2+k][0];
+                  //System.out.println("Checkoint3");
+               }
+               k += 1;
+            }
+            j += 1;
+         }
+         i += 1;
+      }
+      //int l = 0;
+      //while (l < nums.length) {
+      //   System.out.print(nums[l][0]+", ");
+      //   System.out.print(nums[l][1]+", ");
+      //   System.out.print(nums[l][2]+", ");
+      //   System.out.println(nums[l][3]);
+      //   l += 1;
+      //}
+      return nums;
+   }
+   
+   public static int[][] numbersInColumn(int m[][][]) {
+      int size = m.length;
+      int[][] nums = new int[size][size];
+      int i = 0;
+      while (i < size) {
+         int j = 0;
+         while (j < size) {
+            if (m[i][j][1] == 0)
+               nums[j][(m[i][j][0])-1] = m[i][j][0];
+            j += 1;
+         }
+         i += 1;
+      }
+      return nums;       
+   }
+   
+   public static int[][] numbersInRow(int m[][][]){
+      int size = m.length;
+      int[][] nums = new int[size][size];
+      int i = 0;
+      while (i < size) {
+         int j = 0;
+         while (j < size) {
+            if (m[i][j][1] == 0)
+               nums[i][(m[i][j][0]-1)] = m[i][j][0];
+            j += 1;
+         }
+         i += 1;
+      }
+   return nums;
+   }
+               
+      
+   
+   public static int getBoxNumber(int[][][] m,int row, int column) {
+      int size = (int) Math.pow(m.length, 0.5); //Find length of box.
+      return ((row/size)*size+column/size);
+   }
+   
+   public static int[] reverseSort(int[] l) {
+      Arrays.sort(l);
+      int[] a = new int[l.length];
+      int i = 0;
+      while (i<l.length){
+         a[a.length-1-i] = l[i];
+         i += 1;
+      }
+      return a;
+   }
+   
+   
+   public static void printPuzzle(int nums[][][]){
+      int numsLength = nums.length-1;
+      for (int i=0;i<=numsLength;i++){
+         System.out.println("");
+         for (int k=0;k<=numsLength;k++){
+            for (int j=0;j<=numsLength;j++) {
+               System.out.print(nums[i][k][j] + " ");
+            }
+         System.out.print("/ ");
+         }
+      }
+   }
+   
+   
+   
+   public static int[][][] removeVals(int[][][] m) {
+      int[] box;
+      int[] row;
+      int[] column;
+      int k = 0;
+      int i = 0;
+      while (i < m.length) {
+         int j = 0;
+         while (j < m.length) {
+            if (m[i][j][1] != 0) {
+               System.out.println(i+" "+j); 
+               box = numbersInBox(m)[getBoxNumber(m,i,j)];
+               for (int randomVariable=0;randomVariable<box.length;randomVariable++)
+                  System.out.print(box[randomVariable]);
+                  //System.out.println();
+               row = numbersInRow(m)[i];
+               for (int randomVariable=0;randomVariable<box.length;randomVariable++)
+                  System.out.print(row[randomVariable]);
+                  //System.out.println();
+               column = numbersInColumn(m)[j];
+               for (int randomVariable=0;randomVariable<box.length;randomVariable++)
+                  System.out.print(column[randomVariable]);
+                  System.out.println();
+               
+               k = 0;
+               while (k < box.length) {
+                  System.out.println("InBox");
+                  if (box[k] != 0) {
+                     int l = 0;
+                     while (m[i][j][l] != 0) {
+                        if (m[i][j][l] == box[k]) {
+                           m[i][j][l] = 0;
+                           m[i][j] = reverseSort(m[i][j]);
+                        }
+                        l += 1;
+                     }
+                  }
+                  k += 1;
+               }
+               
+               k = 0;
+               while (k < row.length) {
+                  System.out.println("InRow");
+                  if (row[k] != 0) {
+                     int l = 0;
+                     //System.out.println(i+" "+j+" "+l);
+                     while ((m[i][j][l] != 0)&&(l<m[i][j].length)) {
+                        System.out.println(i+" "+j+" "+l);
+                        if (m[i][j][l] == row[k]) {
+                           m[i][j][l] = 0;
+                           m[i][j] = reverseSort(m[i][j]);
+                        }
+                        l += 1;
+                     }
+                  }
+                  k += 1;
+               }
+               
+               k = 0;
+               while (k < column.length) {
+                  System.out.println("InColumn");
+                  if (column[k] != 0) {
+                     int l = 0;
+                     while (m[i][j][l] != 0) {
+                        if (m[i][j][l] == column[k]) {
+                           m[i][j][l] = 0;
+                           m[i][j] = reverseSort(m[i][j]);
+                        }
+                        l += 1;
+                     }
+                  }
+                  k += 1;
+               }
+            }
+            //System.out.println("\n"+i+" "+j);
+            //System.out.println(m[i][j][0]);
+            //System.out.println(m[i][j][1]);
+            //System.out.println(m[i][j][2]);
+            //System.out.println(m[i][j][3]);
+            j += 1;
+         }
+         i += 1;
+      }
+      return m;
+   }
+}
