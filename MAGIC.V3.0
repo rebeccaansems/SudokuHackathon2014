@@ -12,7 +12,7 @@ public class SudokuSolver {
       
       //LOOP TILL YOU GOT IT!!
       while (cont > 0){
-         puzzle2 = onlyChoiceRule(puzzle);
+         puzzle = onlyChoiceRule(puzzle);
          cont = 0;
          int i = 0;
          while (i < size) {
@@ -47,7 +47,7 @@ public class SudokuSolver {
             while (k < size) {
             //System.out.println("Checkoint2 "+i+" "+j+" "+k);
                if (m[(i/size)*size+j][(i%size)*size+k][1] == 0){ // If number is the only one.
-                  nums[i]m[(i/size)*size+j][(i%size)*size+k][0])-1] = mm[(i/size)*size+j][(i%size)*size+k][0];
+                  nums[i][(m[(i/size)*size+j][(i%size)*size+k][0])-1] = m[(i/size)*size+j][(i%size)*size+k][0];
                   //System.out.println("Checkoint3");
                }
                k += 1;
