@@ -1,0 +1,174 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.Color;
+import java.awt.event.*;
+import javax.swing.border.LineBorder;
+import java.util.Arrays;
+
+public class Testing implements ActionListener{
+   
+  public static void main(String[] args) {
+      String inputSize;
+      
+      //Display GUI to ask for puzzle size
+      inputSize = JOptionPane.showInputDialog("Please enter the size of your sudoku board: ");
+      int n = Integer.parseInt(inputSize); 
+      
+      //Make Sudoku GUI
+      Testing sudoku = new Testing(n);                 
+  } 
+  
+  
+  public void actionPerformed(ActionEvent e) {
+      JButton button = (JButton)e.getSource();
+      String name = button.getName();
+      int i = Integer.parseInt(name.substring(0,1));
+      int j = Integer.parseInt(name.substring(1,2));
+      JFrame editFrame = new JFrame("Editting menu");
+      Container con = editFrame.getContentPane();
+      con.setLayout(new GridLayout(9,9));
+      for (int k = 1; k < 10; k++)
+         con.add(new JButton());
+      
+      editFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      editFrame.setBounds(600,0,300,300);
+      editFrame.setVisible(true);
+  }
+   
+   
+  public Testing(int n) {
+      String inputPuzzle; 
+      int puzzle[][] = new int[n][n];
+      JButton numberBox[][] = new JButton[n][n];
+      
+      //Create initial Sudoku GUI
+      JFrame frame = new JFrame("Awesome Sudoku");
+      Container con = frame.getContentPane();
+      con.setLayout(new GridLayout(n,n));
+      
+      for (int i = 0; i < n; i++)
+         for (int j = 0; j < n; j++) {
+             //Create buttons (boxes)
+             con.add(numberBox[i][j] = new JButton());
+             numberBox[i][j].addActionListener(this);
+             numberBox[i][j].setName(""+i+""+j);
+             
+             //Create Sudoku gridlines
+             numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,Color.BLACK));
+             
+             if (i%Math.pow(n,0.5) == 0 && j%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(4, 4, 1, 1,Color.BLACK));
+               
+             else if (j%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 4, 1, 1,Color.BLACK));
+             
+             else if (i%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(4, 1, 1, 1,Color.BLACK));
+               
+             if (i == n-1 && j == n-1)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 4, 4,Color.BLACK));
+               
+             else if (i == n-1 && j%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 4, 4, 1,Color.BLACK));  
+               
+             else if (i == n-1 && i%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(4, 1, 4, 1,Color.BLACK)); 
+               
+             else if (j == n-1 && j%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 4, 1, 4,Color.BLACK)); 
+                  
+             else if (j == n-1 && i%Math.pow(n,0.5) == 0)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(4, 1, 1, 4,Color.BLACK));  
+               
+             else if (i == n-1)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 4, 1,Color.BLACK));
+               
+             else if (j == n-1)
+               numberBox[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 4,Color.BLACK));  
+         }
+               
+      frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      frame.setBounds(0,0,600,600);
+      frame.setVisible(true);
+      
+      
+      //Display GUI to get data on the i-th Sudoku row 
+      for (int i = 0; i < n; i++) {
+         
+         //Quit if size of puzzle is greater than 9
+         if (n > 9) {
+            JOptionPane.showMessageDialog(null, "max sudoku size is 9", "ERROR", JOptionPane.ERROR_MESSAGE);
+            frame.dispose();
+            break;
+         }   
+         
+         inputPuzzle = JOptionPane.showInputDialog("Please input the values of row #" + i + " of the sudoku board (q to quit): ");
+         
+         //If cancel is pressed, delete previous row
+         if (inputPuzzle == null) {
+            if (i > 0) {
+               i--;
+               for (int j = 0; j < n; j++)
+                  numberBox[i][j].setText("");   
+               i--;   
+            }
+            else
+               i--;
+         }
+         
+         //If q is pressed, end process
+         else if (inputPuzzle.equals("q")) {
+            frame.dispose();
+            break;
+         }
+         
+         //Else, add row to Sudoku GUI 
+         else
+            for (int j = 0; j < n; j++)
+               if (inputPuzzle.length() > j)
+                  if (inputPuzzle.charAt(j) != '0' && inputPuzzle.charAt(j) != ' ')
+                     numberBox[i][j].setText(inputPuzzle.substring(j,j+1));   
+      }  
+      
+      
+      //Save Sudoku grid
+      int grid[][] = new int[n][n];
+      for (int i = 0; i < n; i++)
+         for (int j = 0; j < n; j++)
+            if (numberBox[i][j].getText().equals(""))
+                grid[i][j] = 0;
+            else
+                grid[i][j] = Integer.parseInt(numberBox[i][j].getText());
+                
+                
+     //Translate to weird 3D Sudoku format
+     int zero[] = new int[n];
+     
+     // initialize our zero array with 1..n
+     // to represent all posible values for 
+     // an empty cell. 
+     for (int i = 0; i < n; i++)
+         zero[i] = i+1;
+         
+     int sudoku3D[][][] = new int[n][n][n];
+     
+     // iterate across y-axis
+     for (int i = 0; i < n; i++){
+         // iterates accross the x-axis
+         for (int j = 0; j < n; j++) {
+            // if the cell does not have a given value
+            if (grid[i][j] == 0) 
+               sudoku3D[i][j] = Arrays.copyOf(zero,zero.length);
+            // other wise the cell was provided a value from the user
+            else {
+               int temp[] = new int[n];
+               temp[0] = grid[i][j];
+               sudoku3D[i][j] = temp;        
+            }
+         }
+     }
+     
+     frame.dispose();
+     SudokuSolver.solvePuzzle(sudoku3D);
+  }  
+}
