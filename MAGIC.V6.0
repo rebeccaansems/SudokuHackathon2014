@@ -1,0 +1,431 @@
+import java.lang.Math;
+import java.util.Arrays;
+public class SudokuSolver {
+   
+   
+   /*
+      COMMENT OUT THE MAIN METHODE FROM THIS WHEN YOU IMPORT IT!!!!!!!!
+   */
+   
+   
+   public static void main(String[] args) {///Hardcoded puzzles
+      int[][][] puzzle1 = {{{3,0,0,0},{1,2,3,4},{1,2,3,4},{1,2,3,4}},{{1,2,3,4},{2,0,0,0},{1,2,3,4},{1,2,3,4}},{{1,2,3,4},{1,2,3,4},{2,0,0,0},{1,2,3,4}},{{1,2,3,4},{1,2,3,4},{1,2,3,4},{3,0,0,0}}};
+      int[][][] puzzle2 = {{{3,0,0,0},{1,2,3,4},{1,2,3,4},{2,0,0,0}},{{2,0,0,0},{1,2,3,4},{1,2,3,4},{4,0,0,0}},{{1,2,3,4},{1,2,3,4},{1,2,3,4},{3,0,0,0}},{{4,0,0,0},{1,2,3,4},{1,2,3,4},{1,2,3,4}}};
+      int[][][] puzzle3 = {{{3,0,0,0},{1,2,3,4},{1,2,3,4},{1,2,3,4}},{{1,2,3,4},{2,0,0,0},{1,2,3,4},{1,2,3,4}},{{1,2,3,4},{1,2,3,4},{2,0,0,0},{1,2,3,4}},{{1,2,3,4},{1,2,3,4},{1,2,3,4},{3,0,0,0}}};
+      int[][][] puzzle4 = {{{2,3,0,0},{1,4,0,0},{1,4,0,0},{2,3,0,0}},{{1,0,0,0},{2,0,0,0},{3,0,0,0},{4,0,0,0}},{{4,0,0,0},{3,0,0,0},{2,0,0,0},{1,0,0,0}},{{2,3,0,0},{1,4,0,0},{1,4,0,0},{2,3,0,0}}};
+      //printPuzzle(puzzle4);
+      run(puzzle4);
+      
+      
+      
+      }
+      
+   public static void run(int[][][] m) {
+      int[][][] s = deepCopy(m);
+      finalSolve(m, s, 0, 0);
+   }
+   
+   public static int[][][] deepCopy(int[][][] m) {
+      int[][][] a = new int[m.length][m.length][m.length];
+      int i = 0;
+      while (i < a.length) {
+         int j = 0;
+         while (j < a.length) {
+            int k = 0;
+            while (k < a.length) {
+               a[i][j][k] = m[i][j][k];
+               k += 1;
+            }
+            j += 1;
+         }
+         i += 1;
+      }
+      return a;
+   }
+      
+   public static boolean fucksPuzzle(int puzzle[][][]){
+      //System.out.println("ThisIFucksPuzzle");
+      //printPuzzle(puzzle);
+      //print();
+      int S = puzzle.length;
+      int size = (int) Math.pow(S, 0.5);
+      int i = 0; // Box number. Read Sudoku like a book.
+         while (i < S) {
+            int[] inBox = new int[S];
+            int j = 0; //Index box row.
+            while (j < size) {
+               int k = 0; //Index box column.
+               while (k < size) {
+                  if (puzzle[(i/size)*size+j][(i%size)*size+k][1] == 0){ // If number is the only one.
+                     //printPuzzle(puzzle);
+                     if (inBox[(puzzle[(i/size)*size+j][(i%size)*size+k][0])-1] != 0) {
+                        return true;
+                     }
+                     inBox[(puzzle[(i/size)*size+j][(i%size)*size+k][0])-1] += 1;
+               }
+               k += 1;
+            }
+            j += 1;
+         }
+         i += 1;
+      }
+      i = 0;//Column
+      while (i < S) {
+         int[] inColumn = new int[S];
+         int j = 0;
+         while (j < S) {
+            if (puzzle[j][i][1] == 0){
+               if (inColumn[(puzzle[j][i][0])-1] != 0) {
+                  return true;
+               }
+               inColumn[(puzzle[j][i][0])-1] += 1;
+            }
+            j += 1;
+         }
+         i += 1;
+      }
+      i = 0;//Rows
+      while (i < S) {
+         int[] inRow = new int[S];
+         int j = 0;
+         while (j < S) {
+            if (puzzle[i][j][1] == 0) {
+               if (inRow[(puzzle[i][j][0])-1] != 0) {   
+                  return true;
+               }
+               inRow[(puzzle[i][j][0])-1] += 1;
+            }
+            j += 1;
+         }
+         i += 1;
+      }
+      return false;
+   }
+      
+   public static void solvePuzzle(int[][][] puzzle) {///Solves the puzzle
+      int cont = 1; //Continue variable
+      int check = 0;
+      boolean check2 = true;
+      int size = puzzle.length;
+      while (cont > 0 && (cont != check || check2)){///Loop until puzzle is solved OR puzzle solution is repeated
+         if (cont == check) {
+            check2 = false;
+         }
+         puzzle = onlyChoiceRule(puzzle);
+         check = cont;
+         cont = 0;
+         int i = 0;
+         while (i < size) {
+            int j = 0;
+            while (j < size) {
+               cont += puzzle[i][j][1];
+               j += 1;
+            }
+            i += 1;
+         }
+      }
+      printPuzzle(puzzle);
+   }
+   
+   public static int[] val(int[] a, int key){
+      int[] ret = new int[a.length];
+      ret[0] = key;
+      System.out.println("Stuff");
+      for(int i=0;i<ret.length;i++)
+         System.out.println(ret[i]);
+      return ret;
+   }
+   
+   
+   public static void finalSolve(int[][][] puzzle, int[][][] faze, int MAGIC, int magic) {
+      System.out.println(MAGIC+" "+magic);
+      System.out.println(puzzle[MAGIC][magic] == faze[MAGIC][magic]);
+      //printPuzzle(puzzle);
+      int track = 0;
+      //System.out.println(puzzle[MAGIC][magic][1]+"  !@#");
+      //System.out.println(puzzle[MAGIC][magic][1]+"   &$#");
+      faze[MAGIC][magic] = val(puzzle[MAGIC][magic], puzzle[MAGIC][magic][track]);
+      //System.out.println("ThisIsFinalSolve");
+      //printPuzzle(puzzle);
+      //print();
+      //System.out.println("THIS IS IMPORTANT THREE "+puzzle[MAGIC][magic][1]);
+      //System.out.println("THIS IS IMPORTANT THREE "+faze[MAGIC][magic][0]);
+      while (fucksPuzzle(faze)) {
+      //System.out.println("\nTHIS IS IMPORTANT TOO "+puzzle[MAGIC][magic][1]);
+         track += 1;
+         if (track >= faze.length) {
+            if (magic == 0) {
+               System.out.println("Move Back");
+               finalSolve(puzzle, faze, MAGIC-1, faze.length-1);
+            }
+            else {
+               System.out.println("Move Back");
+               finalSolve(puzzle, faze, MAGIC, magic-1);
+            }
+         }
+         else{
+            //System.out.println("\nTHIS IS IMPORTANT "+puzzle[MAGIC][magic][track]);
+            //System.out.println("THIS IS IMPORTANT "+puzzle[MAGIC][magic][1]);
+            faze[MAGIC][magic] = val(puzzle[MAGIC][magic], puzzle[MAGIC][magic][track]);
+         }
+      }
+      System.out.println("Move Farward");
+      if(magic+1 == faze.length){
+         if (MAGIC+1 == faze.length) {
+            printPuzzle(faze);
+         }
+         else {
+            finalSolve(puzzle, faze, MAGIC+1, 0);
+         }
+      }
+      else {
+         finalSolve(puzzle, faze, MAGIC, magic+1);
+      }
+   }   
+               
+       
+ 
+   public static char[][] finalizePuzzle(int[][][] puzzle){
+      char[][] finalPuzzle = new char[puzzle.length][puzzle.length];
+      for(int i = 0;i<puzzle.length;i++){
+         for(int k = 0;k<puzzle.length;k++){
+            finalPuzzle[i][k] = (""+puzzle[i][k][0]).charAt(0);}
+         }
+      return finalPuzzle;
+      }
+   
+   
+   public static void print() {///Line break
+      System.out.println();
+   }
+   
+   public static int[][] numbersInBox(int m[][][]) {///Removes duplicate numbers (in the j's) from boxes
+      int S = m.length;
+      int size = (int) Math.pow(S, 0.5); //Find length of box.
+      
+      int[][] nums = new int[S][S];
+      int i = 0; // Box number. Read Sudoku like a book.
+      while (i < S) {
+         int j = 0; //Index box row.
+         while (j < size) {
+            int k = 0; //Index box column.
+            while (k < size) {
+               if (m[(i/size)*size+j][(i%size)*size+k][1] == 0){ // If number is the only one.
+                  nums[i][(m[(i/size)*size+j][(i%size)*size+k][0])-1] = m[(i/size)*size+j][(i%size)*size+k][0];
+               }
+               k += 1;
+            }
+            j += 1;
+         }
+         i += 1;
+      }
+      return nums;
+   }
+   
+   public static int[][] numbersInColumn(int m[][][]) {///Removes duplicate numbers (in the j's) from columns
+      int size = m.length;
+      int[][] nums = new int[size][size];
+      int i = 0;
+      while (i < size) {
+         int j = 0;
+         while (j < size) {
+            if (m[i][j][1] == 0)
+               nums[j][(m[i][j][0])-1] = m[i][j][0];
+            j += 1;
+         }
+         i += 1;
+      }
+      return nums;       
+   }
+   
+   public static int[][] numbersInRow(int m[][][]){///Removes duplicate numbers (in the j's) from rowes
+      int size = m.length;
+      int[][] nums = new int[size][size];
+      int i = 0;
+      while (i < size) {
+         int j = 0;
+         while (j < size) {
+            if (m[i][j][1] == 0)
+               nums[i][(m[i][j][0]-1)] = m[i][j][0];
+            j += 1;
+         }
+         i += 1;
+      }
+   return nums;
+   }
+               
+   public static int getBoxNumber(int[][][] m,int row, int column) {///Figure out which "box"/quadrant we're in
+      int size = (int) Math.pow(m.length, 0.5); //Find length of box.
+      return ((row/size)*size+column/size);
+   }
+   
+   public static int[] reverseSort(int[] l) {///Reverses j list (0,0,0,3 -> 3,0,0,0)
+      Arrays.sort(l);
+      int[] a = new int[l.length];
+      int i = 0;
+      while (i<l.length){
+         a[a.length-1-i] = l[i];
+         i += 1;
+      }
+      return a;
+   }
+   
+   public static void printPuzzle(int nums[][][]){///Prints the puzzles
+      int numsLength = nums.length-1;
+      for (int i=0;i<=numsLength;i++){
+         System.out.println("");
+         for (int k=0;k<=numsLength;k++){
+            if(nums[i][k][1]==0)
+               System.out.print(nums[i][k][0] + " ");///prints known number
+            else
+               System.out.print("x ");///prints unknown number (still has multiple numbers in the j list)
+         }
+      }
+   }
+   
+   public static int[][][] onlyChoiceRule(int[][][] m) {
+   /* There may be only one possible choice for a particular Sudoku square. 
+   In the simplest case you have a group (row, column or region) that has 
+   eight squares allocated leaving only one remaining choice available; so the 
+   remaining number must go in that empty square.  */
+      int[] box;
+      int[] row;
+      int[] column;
+      int k = 0;
+      int i = 0;
+      while (i < m.length) {///repeat until end of matrix row
+         int j = 0;
+         while (j < m.length) {///repeat until end of matrix column
+            if (m[i][j][1] != 0) {///if second box is not 0 (eg not a known number)
+               box = numbersInBox(m)[getBoxNumber(m,i,j)];
+               row = numbersInRow(m)[i];
+               column = numbersInColumn(m)[j];
+               
+               k = 0;
+               while (k < box.length) {
+                  if (box[k] != 0) {
+                     int l = 0;
+                     while ((m[i][j][l] != 0) && (l<m[i][j].length-1)) {
+                        if (m[i][j][l] == box[k]) {
+                           m[i][j][l] = 0;
+                           m[i][j] = reverseSort(m[i][j]);
+                        }
+                        l += 1;
+                     }
+                  }
+                  k += 1;
+               }
+               
+               k = 0;
+               while (k < row.length) {
+                  if (row[k] != 0) {
+                     int l = 0;
+                     while ((m[i][j][l] != 0) && (l<m[i][j].length-1)) {
+                        if (m[i][j][l] == row[k]) {
+                           m[i][j][l] = 0;
+                           m[i][j] = reverseSort(m[i][j]);
+                        }
+                        l += 1;
+                     }
+                  }
+                  k += 1;
+               }
+               
+               k = 0;
+               while (k < column.length) {
+                  if (column[k] != 0) {
+                     int l = 0;
+                     while ((m[i][j][l] != 0) && (l<m[i][j].length-1)) {
+                        if (m[i][j][l] == column[k]) {
+                           m[i][j][l] = 0;
+                           m[i][j] = reverseSort(m[i][j]);
+                        }
+                        l += 1;
+                     }
+                  }
+                  k += 1;
+               }
+            }
+            j += 1;
+         }
+         i += 1;
+      }
+      return m;
+   }
+   
+   
+   
+   
+   /*
+   
+   THIS DOESN'T REALLY WORK, BUT IT HAS NO BUGS,
+   SO I'M LEAVING IT HERE IN CASE I WANT TO 
+   WORK ON IT LATER. AKA AFTER I GET FED UP WITH
+   SOMETHING ELSE, AND I THINK THAT THIS MIGHT BE
+   EASIER.
+   -Love JACOB 
+   
+   public static int[][][] anyUniqueNums(int[][][] array) {
+      int[][][] m = Arrays.copyOf(array, array.length);
+      return m;
+   }
+   
+   public static int[][][] uniqueNumInBox(int[][][] m) {
+      int S = m.length;
+      int size = (int) Math.pow(S, 0.5); //Find length of box.
+      int[][] nums = new int[S][S];
+      int i = 0; //Box number
+      int j = 0; //Box row
+      int k = 0; //Box column
+      while (i < m.length) {
+         j = 0;
+         while (j < size) {
+            k = 0;
+            while (k < size) {
+               if (m[(i/size)*size+j][(i%size)*size+k][1] != 0){ // If there is more then one option.
+                  nums[i][m[(i/size)*size+j][(i%size)*size+k][0]-1] += m[(i/size)*size+j][(i%size)*size+k][0];
+               }
+            k += 1;
+            }
+         j += 1;
+         }
+         int[] uniqueNumbers = new int[S];
+         int l = 0;
+         while (l<nums[i].length) {
+            if (nums[i][l] == i+1) {
+               uniqueNumbers[l] = l+l;
+            }
+         l += 1;
+         }
+         Arrays.sort(uniqueNumbers);
+      
+         l = 0;
+         while (l<uniqueNumbers.length && uniqueNumbers[l] != 0) {
+            j = 0; //Box row
+            while (j < size) {
+               k = 0; //Box column
+               while (k < size) {
+                  int tempIndex = 0;
+                  while (tempIndex < m[(i/size)*size+j][(i%size)*size+k].length) {
+                     if (uniqueNumbers[l] == m[(i/size)*size+j][(i%size)*size+k][tempIndex]) {
+                        m[(i/size)*size+j][(i%size)*size+k][0] = uniqueNumbers[l];
+                        int changeAll = 1;
+                        while (changeAll <  m[(i/size)*size+j][(i%size)*size+k].length) {
+                           m[(i/size)*size+j][(i%size)*size+k][changeAll] = 0;
+                           changeAll += 1;
+                        }
+                     }
+                     tempIndex += 1;  
+                  }
+                  k += 1;
+               }
+               j += 1;
+            }
+            l += 1;
+         }
+         i += 1;
+      }            
+      return m;   
+   }
+   */
+}
