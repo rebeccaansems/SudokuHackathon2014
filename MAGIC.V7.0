@@ -1,0 +1,124 @@
+import java.lang.Math;
+public class Sudoku {
+
+   public static void main(String[] args) {
+      int[][] puzzle1 = {{0,0,0,0},{1,0,3,4},{4,3,2,1},{0,0,0,0}};
+      printPuzzle(solve(puzzle1));
+   }
+   
+   public static int[][] deepcopy(int[][] m) {
+      int i = 0;
+      int[][] n = new int[m.length][m[i].length];
+      while (i<m.length) {
+         int j = 0;
+         while (j<m[i].length) {
+            n[i][j] = m[i][j];
+            j += 1;
+         }
+         i += 1;
+      }
+      return n;
+   }
+   
+   public static boolean conflicts(int k, int i, int j, int[][] m) {
+      if (rowConflict(k,i,m) || columnConflict(k,j,m) || boxConflict(k,i,j,m)) {
+         return true;
+      }
+      return false;
+   }
+   
+   public static boolean rowConflict(int k,int i,int[][] m) {
+      for (int j=0;j<m[i].length;j++) {
+         if (m[i][j] == k) {
+            return true;
+         }
+      }
+      return false;
+   }
+   
+   public static boolean columnConflict(int k,int j,int[][] m) {
+      for (int i=0;i<m.length;i++) {
+         if (m[i][j] == k) {
+            return true;
+         }
+      }
+      return false;
+   }
+   
+   public static boolean boxConflict(int t,int i,int j,int[][] m) {
+      int k = 0; //WOOPS
+      int size = (int) Math.pow(m.length, 0.5);
+      while (k < size) {
+         int l = 0;
+         while (l < size) {
+            if (m[(i/size)*size+k][(j/size)*size+l] == t) {
+               return true;
+            }
+            l += 1;
+         }
+         k += 1;
+      }
+      return false;
+   }
+   
+   public static int[][] solve(int[][] m) {
+      int[][] puzzle = deepcopy(m);
+      boolean moveForward = true;
+      int size = puzzle.length;
+      for (int i = 0; i<size; i++) {
+         for (int j = 0; j<size; j++) {
+            if (m[i][j] == 0) {
+               int k = 0;
+               for (k = puzzle[i][j]+1; k<=size; k++) {
+                  if (!conflicts(k,i,j,puzzle)) {
+                     puzzle[i][j] = k;
+                     moveForward = true;
+                     break;
+                  }
+               }
+               if (k > size){
+                  moveForward = false;
+               }
+            }
+            if (!moveForward) {
+               if (m[i][j] == 0) {
+                  puzzle[i][j] = 0;
+               }
+               j -= 2;
+            }
+            if (j == -2) {
+               i -= 1;
+               j = size-2;
+            }
+         }
+      }
+      return puzzle;
+   }
+   
+   
+   public static void printPuzzle(int nums[][]){///Prints the puzzles
+      int numsLength = nums.length-1;
+      for (int i=0;i<=numsLength;i++){
+         System.out.println("");
+         for (int k=0;k<=numsLength;k++){
+               System.out.print(nums[i][k]);///prints known number
+         }
+      }
+   }
+   
+   public static char[][] charArray(int[][] m) {
+      int size = m.length;
+      char[][] c = new char[size][size];
+      for (int i=0;i<size;i++) {
+         for (int j=0;j<size;j++) {
+            c[i][j] = (""+m[i][j]).charAt(0);
+         }
+      }
+      return c;
+   }
+}
+                
+                  
+                     
+   
+   
